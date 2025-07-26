@@ -1,0 +1,32 @@
+{
+  "name": "canvas-animation",
+  "version": "1.0.0",
+  "description": "animation for my song",
+  "main": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "npm run build && node dist/index.js",
+    "biome:fix": "biome check --write",
+    "video": "ffmpeg -framerate 12 -i dist/frames/frame_%d.png -i assets/drumy_104_v4.wav -vf \"scale=1920:1080\" -c:v libx264 -c:a aac -pix_fmt yuv420p a.mp4",
+    "start": "npm run build && node dist/index.js && npm run video"
+  },
+  "keywords": [
+    "animation",
+    "canvas",
+    "midi"
+  ],
+  "author": "Jiri Kouba",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^24.0.8",
+    "canvas": "^3.1.2",
+    "color": "^5.0.0",
+    "midi-file": "^1.2.4",
+    "noisejs": "^2.1.0",
+    "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.0.6"
+  }
+}
