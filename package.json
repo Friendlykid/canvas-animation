@@ -8,7 +8,7 @@
     "build": "tsc",
     "dev": "npm run build && node dist/index.js",
     "biome:fix": "biome check --write",
-    "video": "ffmpeg -framerate 12 -i dist/frames/frame_%d.png -i assets/drumy_104_v4.wav -vf \"scale=1920:1080\" -c:v libx264 -c:a aac -pix_fmt yuv420p a.mp4",
+    "video": "ffmpeg -framerate 12 -i dist/frames/frame_%d.png -i assets/drumy_104_v4.wav -vf \"scale=-1:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black\" -c:v libx264 -c:a aac -pix_fmt yuv420p e.mp4",
     "start": "npm run build && node dist/index.js && npm run video"
   },
   "keywords": [

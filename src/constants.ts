@@ -12,7 +12,7 @@ export const FRAME_COUNT = FRAME_RATE * SONG_LENGTH;
 export const OUTPUT_DIR = "dist/frames";
 
 // Length of each sound that have fixed length in frames
-export const KICK_LENGHT = FRAME_RATE / 6;
+export const KICK_LENGHT = FRAME_RATE / 6; //TODO for 24 fps shorten it to FRAME_RATE / 8
 export const SNARE_1_LENGTH = FRAME_RATE / 6;
 export const SNARE_2_LENGTH = FRAME_RATE / 2;
 

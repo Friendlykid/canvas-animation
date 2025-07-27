@@ -2,25 +2,14 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { createCanvas, type Image } from "canvas";
 import { FRAME_COUNT, OUTPUT_DIR, ZOOM_MAX, ZOOM_MIN } from "./constants.js";
 import { alterImage } from "./effects/alterImage.js";
-import { isKickPlaying } from "./instruments/kick.js";
-import type { KickEvent, MidiEvent } from "./parseMidiEvents.js";
-import { addFrameNumber, computeCoordinates } from "./utils.js";
+import { isKickPlaying } from "./state/kick.js";
+import {
+	addBassLabel,
+	addFrameNumber,
+	computeCoordinates,
+} from "./utils/utils.js";
 
-export const loop = ({
-	image,
-	kick,
-	snare,
-	keys,
-	bass,
-	synth,
-}: {
-	image: Image;
-	kick: KickEvent[];
-	snare: MidiEvent[];
-	keys: MidiEvent[];
-	bass: MidiEvent[];
-	synth: MidiEvent[];
-}) => {
+export const loop = ({ image }: { image: Image }) => {
 	const canvas = createCanvas(image.width, image.height);
 	const ctx = canvas.getContext("2d");
 
@@ -42,7 +31,7 @@ export const loop = ({
 			drawwidth,
 			image.width,
 			image.height,
-			isKickPlaying(kick, frame),
+			isKickPlaying(frame),
 		);
 		ctx.clearRect(0, 0, image.width, image.height);
 
@@ -63,7 +52,7 @@ export const loop = ({
 			image.height,
 		);
 		addFrameNumber(ctx, frame, image.height);
-
+		addBassLabel(ctx, frame, image.height);
 		const buffer = canvas.toBuffer("image/png");
 		writeFileSync(`${OUTPUT_DIR}/frame_${frame}.png`, buffer);
 		console.log(`Frame ${frame + 1}/${FRAME_COUNT}`);

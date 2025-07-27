@@ -1,5 +1,5 @@
 import pkg from "noisejs";
-import { FRAME_COUNT } from "./constants.js";
+import { FRAME_COUNT } from "../constants.js";
 
 const { Noise } = pkg;
 

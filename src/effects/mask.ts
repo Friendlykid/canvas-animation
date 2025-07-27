@@ -1,7 +1,7 @@
 import Color from "color";
+import { STATE } from "../state/state.js";
 
 export const saturationMask = (
-	rgbaValues: Uint8ClampedArray<ArrayBufferLike>,
 	/**
 	 * values from 0 to 100
 	 */
@@ -12,7 +12,7 @@ export const saturationMask = (
 ) => {
 	let min: number = Number.MAX_VALUE;
 	let max: number = Number.MIN_VALUE;
-	const copy = new Uint8ClampedArray(rgbaValues);
+	const copy = new Uint8ClampedArray(STATE.originalImageData);
 
 	// Determine the region to process
 	const startX = visibleRegion ? Math.floor(visibleRegion.sx) : 0;
@@ -48,7 +48,6 @@ export const saturationMask = (
 	return copy;
 };
 export const lightnessMask = (
-	rgbaValues: Uint8ClampedArray<ArrayBufferLike>,
 	/**
 	 * values from 0 to 100
 	 */
@@ -57,7 +56,7 @@ export const lightnessMask = (
 	imageHeight: number,
 	visibleRegion?: { sx: number; sy: number; width: number; height: number },
 ) => {
-	const copy = new Uint8ClampedArray(rgbaValues);
+	const copy = new Uint8ClampedArray(STATE.originalImageData);
 
 	// Determine the region to process
 	const startX = visibleRegion ? Math.floor(visibleRegion.sx) : 0;

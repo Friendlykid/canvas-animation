@@ -1,5 +1,5 @@
 import type { MidiData, MidiNoteOffEvent, MidiNoteOnEvent } from "midi-file";
-import { TICKS_PER_FRAME } from "./constants.js";
+import { TICKS_PER_FRAME } from "../constants.js";
 
 export type BaseEvent = {
 	frame: number;
@@ -23,7 +23,7 @@ export const parseMidiEvents = (midiData: MidiData, frameLength?: number) => {
 		frameOffset += event.deltaTime / TICKS_PER_FRAME;
 		events[i] = {
 			...event,
-			frame: Math.floor(frameOffset),
+			frame: Math.round(frameOffset),
 		} as MidiEvent;
 	}
 
