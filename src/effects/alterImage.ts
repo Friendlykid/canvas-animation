@@ -25,12 +25,12 @@ export const alterImage = (
 	const imageData = ctx.getImageData(0, 0, image.width, image.height);
 
 	if (isIntro(frame)) {
-		ctx.putImageData(introMask(imageData.data, frame, visibleRegion), 0, 0);
+		ctx.putImageData(introMask(frame, visibleRegion), 0, 0);
 		return canvas;
 	}
 
 	if (isHeavyPart(frame)) {
-		ctx.putImageData(heavy(imageData.data, frame, visibleRegion), 0, 0);
+		ctx.putImageData(heavy(frame, visibleRegion), 0, 0);
 		return canvas;
 	}
 

@@ -12,6 +12,12 @@ export const STATE: State = {
 	keys: [],
 	width: 0,
 	height: 0,
+	medianSaturation: 0,
+	medianLightness: 0,
+	quantilLowSaturation: 0,
+	quantilHighSaturation: 0,
+	quantilLowLightness: 0,
+	quantilHighLightness: 0,
 };
 
 export const setState = (newState: Partial<State>) => {
@@ -27,6 +33,12 @@ export type State = {
 	keys: MidiEvent[];
 	width: number;
 	height: number;
+	medianSaturation: number;
+	medianLightness: number;
+	quantilLowSaturation: number;
+	quantilHighSaturation: number;
+	quantilLowLightness: number;
+	quantilHighLightness: number;
 };
 
 type InstrumentKey = {

@@ -1,33 +1,27 @@
 import { createImageData } from "canvas";
 import { STATE } from "../state/state.js";
+import { perlinToRange } from "../utils/convert.js";
 import { perlinNoise } from "../utils/perlin.js";
 import { lightnessMask, saturationMask } from "./mask.js";
 import type { ImageEffect } from "./types.js";
 
-let maskValue: number = 30;
-
-export const introMask: ImageEffect = (_pixelArr, frame, visibleRegion) => {
+export const introMask: ImageEffect = (frame, visibleRegion) => {
 	const perlinValue = perlinNoise(frame);
-	if (maskValue + 5 * perlinValue > 95) {
-		maskValue -= Math.abs(5 * perlinValue);
-	}
-	if (maskValue + 5 * perlinValue < 20) {
-		maskValue += Math.abs(5 * perlinValue);
-	} else {
-		maskValue += 5 * perlinValue; // Scale to 0-100
-	}
-	const lightnessData = lightnessMask(
-		maskValue,
-		STATE.width,
-		STATE.height,
-		visibleRegion,
+
+	const lightnessValue = perlinToRange(
+		perlinValue,
+		STATE.quantilLowLightness,
+		STATE.quantilHighLightness,
 	);
-	const saturationData = saturationMask(
-		maskValue,
-		STATE.width,
-		STATE.height,
-		visibleRegion,
+
+	const saturationValue = perlinToRange(
+		perlinValue,
+		STATE.quantilLowSaturation,
+		STATE.quantilHighSaturation,
 	);
+
+	const lightnessData = lightnessMask(lightnessValue, visibleRegion);
+	const saturationData = saturationMask(saturationValue, visibleRegion);
 	return createImageData(
 		lightnessData.map((value, index) => {
 			return value || saturationData[index];

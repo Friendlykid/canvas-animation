@@ -1,6 +1,6 @@
 import type { CanvasRenderingContext2D } from "canvas";
 import { FRAME_RATE } from "../constants.js";
-import { getCurrentNote } from "../state/state.js";
+import { getCurrentNote, STATE } from "../state/state.js";
 
 export const addFrameNumber = (
 	ctx: CanvasRenderingContext2D,
@@ -34,8 +34,6 @@ export const computeCoordinates = (
 	progress: number,
 	drawheight: number,
 	drawwidth: number,
-	width: number,
-	height: number,
 	isKickPlaying: boolean,
 ): { sx: number; sy: number } => {
 	const easeProgress = progress * progress * (3 - 2 * progress); // Smooth curve
@@ -43,8 +41,8 @@ export const computeCoordinates = (
 	const offsetY = easeProgress * 100 - 50; // Vertical movement
 
 	// Calculate desired source coordinates
-	let sx = width / 2 + offsetX - drawwidth / 2;
-	let sy = height / 2 + offsetY - drawheight / 2;
+	let sx = STATE.width / 2 + offsetX - drawwidth / 2;
+	let sy = STATE.height / 2 + offsetY - drawheight / 2;
 	if (isKickPlaying) {
 		const shakeIntensity = 3; // pixels
 		const angle = Math.random() * 2 * Math.PI;
@@ -55,10 +53,29 @@ export const computeCoordinates = (
 	}
 
 	// Clamp source coordinates to image boundaries
-	sx = Math.max(0, Math.min(sx, width - drawwidth));
-	sy = Math.max(0, Math.min(sy, height - drawheight));
+	sx = Math.floor(Math.max(0, Math.min(sx, STATE.width - drawwidth)));
+	sy = Math.floor(Math.max(0, Math.min(sy, STATE.height - drawheight)));
 
 	return { sx, sy };
+};
+
+export const getRegion = ({
+	height,
+	width,
+	sx,
+	sy,
+}: {
+	sx: number;
+	sy: number;
+	width: number;
+	height: number;
+}) => {
+	const startX = sx;
+	const endX = Math.min(sx + width, STATE.width);
+	const startY = sy;
+	const endY = Math.min(sy + height, STATE.height);
+
+	return { startX, endX, startY, endY };
 };
 
 export const secondsToFrames = (seconds: number): number => {

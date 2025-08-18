@@ -3,6 +3,7 @@ import { createCanvas, type Image } from "canvas";
 import { FRAME_COUNT, OUTPUT_DIR, ZOOM_MAX, ZOOM_MIN } from "./constants.js";
 import { alterImage } from "./effects/alterImage.js";
 import { isKickPlaying } from "./state/kick.js";
+import { STATE } from "./state/state.js";
 import {
 	addBassLabel,
 	addFrameNumber,
@@ -10,7 +11,7 @@ import {
 } from "./utils/utils.js";
 
 export const loop = ({ image }: { image: Image }) => {
-	const canvas = createCanvas(image.width, image.height);
+	const canvas = createCanvas(STATE.width, STATE.height);
 	const ctx = canvas.getContext("2d");
 
 	// Create the output directory if it doesn't exist
@@ -22,18 +23,16 @@ export const loop = ({ image }: { image: Image }) => {
 		//const currentZoom = 1; // for testing
 		ctx.restore();
 
-		const drawwidth = image.width / currentZoom;
-		const drawheight = image.height / currentZoom;
+		const drawwidth = Math.floor(STATE.width / currentZoom);
+		const drawheight = Math.floor(STATE.height / currentZoom);
 
 		const { sx, sy } = computeCoordinates(
 			progress,
 			drawheight,
 			drawwidth,
-			image.width,
-			image.height,
 			isKickPlaying(frame),
 		);
-		ctx.clearRect(0, 0, image.width, image.height);
+		ctx.clearRect(0, 0, STATE.width, STATE.height);
 
 		ctx.drawImage(
 			alterImage(image, frame, {
@@ -48,11 +47,11 @@ export const loop = ({ image }: { image: Image }) => {
 			drawheight,
 			0,
 			0,
-			image.width,
-			image.height,
+			STATE.width,
+			STATE.height,
 		);
-		addFrameNumber(ctx, frame, image.height);
-		addBassLabel(ctx, frame, image.height);
+		addFrameNumber(ctx, frame, STATE.height);
+		addBassLabel(ctx, frame, STATE.height);
 		const buffer = canvas.toBuffer("image/png");
 		writeFileSync(`${OUTPUT_DIR}/frame_${frame}.png`, buffer);
 		console.log(`Frame ${frame + 1}/${FRAME_COUNT}`);
