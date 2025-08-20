@@ -13,8 +13,8 @@ export const saturationMask = (
 		sy,
 		width,
 	}: { sx: number; sy: number; width: number; height: number },
-	blackLesser?: boolean,
-	whiteGreater?: boolean,
+	isNotBlack?: boolean,
+	isNotWhite?: boolean,
 ) => {
 	const copy = new Uint8ClampedArray(STATE.originalImageData);
 
@@ -26,11 +26,11 @@ export const saturationMask = (
 			const i = (y * STATE.width + x) * 4;
 			const color = Color.rgb(copy[i], copy[i + 1], copy[i + 2]);
 
-			if (color.saturationl() < saturation && blackLesser) {
+			if (color.saturationl() < saturation && !isNotBlack) {
 				copy[i] = 0;
 				copy[i + 1] = 0;
 				copy[i + 2] = 0;
-			} else if (whiteGreater) {
+			} else if (!isNotWhite) {
 				copy[i] = 255;
 				copy[i + 1] = 255;
 				copy[i + 2] = 255;
@@ -50,8 +50,11 @@ export const lightnessMask = (
 		sy,
 		width,
 	}: { sx: number; sy: number; width: number; height: number },
-	blackLesser?: boolean,
-	whiteGreater?: boolean,
+	/**
+	 *
+	 */
+	isNotBlack?: boolean,
+	isNotWhite?: boolean,
 ) => {
 	const copy = new Uint8ClampedArray(STATE.originalImageData);
 
@@ -62,11 +65,11 @@ export const lightnessMask = (
 		for (let x = startX; x < endX; x++) {
 			const i = (y * STATE.width + x) * 4;
 			const color = Color.rgb(copy[i], copy[i + 1], copy[i + 2]);
-			if (color.lightness() < lightness && blackLesser) {
+			if (color.lightness() < lightness && !isNotBlack) {
 				copy[i] = 0;
 				copy[i + 1] = 0;
 				copy[i + 2] = 0;
-			} else if (whiteGreater) {
+			} else if (!isNotWhite) {
 				copy[i] = 255;
 				copy[i + 1] = 255;
 				copy[i + 2] = 255;

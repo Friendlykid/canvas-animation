@@ -4,6 +4,7 @@ import { FRAME_COUNT, OUTPUT_DIR, ZOOM_MAX, ZOOM_MIN } from "./constants.js";
 import { alterImage } from "./effects/alterImage.js";
 import { isKickPlaying } from "./state/kick.js";
 import { STATE } from "./state/state.js";
+import { introSkew } from "./utils/introSkew.js";
 import {
 	addBassLabel,
 	addFrameNumber,
@@ -23,8 +24,8 @@ export const loop = ({ image }: { image: Image }) => {
 		//const currentZoom = 1; // for testing
 		ctx.restore();
 
-		const drawwidth = Math.floor(STATE.width / currentZoom);
-		const drawheight = Math.floor(STATE.height / currentZoom);
+		const drawwidth = image.width / currentZoom;
+		const drawheight = image.height / currentZoom;
 
 		const { sx, sy } = computeCoordinates(
 			progress,
@@ -50,6 +51,7 @@ export const loop = ({ image }: { image: Image }) => {
 			STATE.width,
 			STATE.height,
 		);
+		introSkew(ctx, frame);
 		addFrameNumber(ctx, frame, STATE.height);
 		addBassLabel(ctx, frame, STATE.height);
 		const buffer = canvas.toBuffer("image/png");

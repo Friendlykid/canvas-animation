@@ -53,8 +53,8 @@ export const computeCoordinates = (
 	}
 
 	// Clamp source coordinates to image boundaries
-	sx = Math.floor(Math.max(0, Math.min(sx, STATE.width - drawwidth)));
-	sy = Math.floor(Math.max(0, Math.min(sy, STATE.height - drawheight)));
+	sx = Math.max(0, Math.min(sx, STATE.width - drawwidth));
+	sy = Math.max(0, Math.min(sy, STATE.height - drawheight));
 
 	return { sx, sy };
 };
@@ -70,10 +70,10 @@ export const getRegion = ({
 	width: number;
 	height: number;
 }) => {
-	const startX = sx;
-	const endX = Math.min(sx + width, STATE.width);
-	const startY = sy;
-	const endY = Math.min(sy + height, STATE.height);
+	const startX = Math.floor(sx);
+	const endX = Math.min(Math.ceil(sx + width), STATE.width);
+	const startY = Math.floor(sy);
+	const endY = Math.min(Math.ceil(sy + height), STATE.height);
 
 	return { startX, endX, startY, endY };
 };

@@ -9,3 +9,7 @@ A TypeScript-based animation generator that creates video animations synchronize
 - **Frame Generation**: Create individual PNG frames for video compilation
 - **Audio Synchronization**: Combine generated frames with audio tracks
 - **Multiple Instruments**: Support for kick, snare, keys, bass, and synth tracks
+
+# LIGHTNESS, SATURATION
+
+- RANGE 0-100
