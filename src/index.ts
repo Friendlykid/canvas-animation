@@ -49,6 +49,15 @@ const main = async () => {
 		const lightness = color.lightness();
 		lightnessArray[i / 4] = lightness;
 	}
+
+	const medianSaturation = median(saturationArray);
+	const medianLightness = median(lightnessArray);
+
+	const quantilLowSaturation = lowQuantil(saturationArray);
+	const quantilLowLightness = lowQuantil(lightnessArray);
+
+	const quantilHighSaturation = highQuantil(saturationArray);
+	const quantilHighLightness = highQuantil(lightnessArray);
 	setState({
 		kick: parseMidiEvents(kickMidi, 0) as KickEvent[],
 		snare: parseMidiEvents(snareMidi, 0),
@@ -58,17 +67,21 @@ const main = async () => {
 		originalImageData: imageData.data,
 		height: image.height,
 		width: image.width,
-		medianSaturation: median(saturationArray),
-		medianLightness: median(lightnessArray),
-		quantilLowSaturation: lowQuantil(saturationArray),
-		quantilHighSaturation: highQuantil(saturationArray),
-		quantilLowLightness: lowQuantil(lightnessArray),
-		quantilHighLightness: highQuantil(lightnessArray),
+		medianSaturation,
+		medianLightness,
+		quantilLowSaturation,
+		quantilLowLightness,
+		quantilHighSaturation,
+		quantilHighLightness,
 	});
 
-	console.log("total length: ", imageData.data.length);
-	console.log("total pixels: ", imageData.data.length / 4);
-	console.log("byte length: ", imageData.data.byteLength);
+	console.log("median saturation: ", medianSaturation);
+	console.log("median lightness: ", medianLightness);
+	console.log("quantil low saturation: ", quantilLowSaturation);
+	console.log("quantil low lightness: ", quantilLowLightness);
+	console.log("quantil high saturation: ", quantilHighSaturation);
+	console.log("quantil high lightness: ", quantilHighLightness);
+
 	ctx.drawImage(image, 0, 0, image.width, image.height);
 
 	loop({

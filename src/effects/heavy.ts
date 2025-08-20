@@ -8,7 +8,11 @@ import { getRegion } from "../utils/utils.js";
 import { lightnessMask, saturationMask } from "./mask.js";
 import type { ImageEffect } from "./types.js";
 
-const FADE_IN_DURATION = 10 * FRAME_RATE; // in seconds
+const FADE_IN_DURATION =
+	SONG_PARTS.HEAVY_PART.end * FRAME_RATE -
+	SONG_PARTS.HEAVY_PART.start * FRAME_RATE; // in seconds
+
+//saturate max to 10
 
 export const heavy: ImageEffect = (frame, { height, sx, sy, width }) => {
 	const { startX, endX, startY, endY } = getRegion({ height, sx, sy, width });
@@ -39,7 +43,7 @@ export const heavy: ImageEffect = (frame, { height, sx, sy, width }) => {
 		width,
 	});
 	const lightenFactor =
-		(100 / FADE_IN_DURATION) *
+		(2 / FADE_IN_DURATION) *
 		(FADE_IN_DURATION -
 			(frame - Math.floor(SONG_PARTS.HEAVY_PART.start * FRAME_RATE)));
 	const LPixelsNew = new Uint8ClampedArray(STATE.originalImageData);
