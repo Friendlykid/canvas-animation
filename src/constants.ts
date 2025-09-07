@@ -43,5 +43,5 @@ export const SONG_PARTS: Record<
 > = {
 	INTRO: { start: 0, end: 271 / 12 },
 	HEAVY_PART: { start: 271 / 12, end: 814 / 12 },
-	SECOND_PART: { start: 814 / 12, end: FRAME_COUNT }, // until the end of the song
+	SECOND_PART: { start: 814 / 12, end: 135.529 }, // until the end of the song
 };

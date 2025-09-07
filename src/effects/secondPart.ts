@@ -17,7 +17,7 @@ const getBassRegion = (noteNumber: number, startY: number, endY: number) => {
 	const rowRange = endY - startY;
 	const bandHeight = Math.max(4, Math.floor(rowRange * 0.1)); // 10% of region height, at least 4px
 	const bandPosition =
-		(Math.abs(noteNumber - LOW_BASS_NOTE) / BASS_NOTE_RANGE) *
+		(1 - (noteNumber - LOW_BASS_NOTE) / BASS_NOTE_RANGE) *
 		(rowRange - bandHeight);
 	return {
 		startRow: startY + bandPosition,
@@ -99,7 +99,6 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 				y >= startBassRowEdge &&
 				y < endBassRowEdge
 			) {
-				//todo tady udělat okraj podle perlin noisu tak, aby se hýbal postupně
 				// Calculate smooth falloff for saturation near edges
 				const bandCenter = (startBassRowEdge + endBassRowEdge) / 2;
 				const bandHalf = (endBassRowEdge - startBassRowEdge) / 2;
@@ -140,9 +139,7 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 				copy[i + 1] = color.green();
 				copy[i + 2] = color.blue();
 			}
-			// pixel in bass region: modify saturation based on perlin noise
 			// outside bass region: leave pixel unchanged
-			// todo pokračuj tady
 			if (saturationPixels[i] === 0 && lightnessPixels[i + 1] === 0) {
 				const color = originalColor.blacken(perlinRowValue + 1);
 				copy[i] = color.red();

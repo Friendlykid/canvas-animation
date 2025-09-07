@@ -2,6 +2,7 @@ import { type Canvas, createCanvas, type Image } from "canvas";
 import { FRAME_RATE, SONG_PARTS } from "../constants.js";
 import { heavy } from "./heavy.js";
 import { introMask } from "./intro.js";
+import { outro } from "./outro.js";
 import { secondPart } from "./secondPart.js";
 
 const isIntro = (frame: number): boolean => {
@@ -20,6 +21,10 @@ const isSecondPart = (frame: number): boolean => {
 		frame / FRAME_RATE >= SONG_PARTS.SECOND_PART.start &&
 		frame / FRAME_RATE < SONG_PARTS.SECOND_PART.end
 	);
+};
+
+const isOutro = (frame: number): boolean => {
+	return frame / FRAME_RATE >= SONG_PARTS.SECOND_PART.end;
 };
 
 export const alterImage = (
@@ -43,6 +48,12 @@ export const alterImage = (
 	}
 	if (isSecondPart(frame)) {
 		ctx.putImageData(secondPart(frame, visibleRegion), 0, 0);
+		return canvas;
+	}
+
+	if (isOutro(frame)) {
+		// for now, just use heavy effect for outro
+		ctx.putImageData(outro(frame, visibleRegion), 0, 0);
 		return canvas;
 	}
 
