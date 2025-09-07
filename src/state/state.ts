@@ -113,5 +113,6 @@ export const getCurrentNote = (instrument: InstrumentKey, frame: number) => {
 		noteNumber: longestNote.noteNumber,
 		startFrame: longestNote.startFrame,
 		endFrame: longestNote.endFrame,
+		progress: (frame - longestNote.startFrame) / longestNote.duration,
 	};
 };

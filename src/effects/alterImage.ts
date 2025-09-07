@@ -2,6 +2,7 @@ import { type Canvas, createCanvas, type Image } from "canvas";
 import { FRAME_RATE, SONG_PARTS } from "../constants.js";
 import { heavy } from "./heavy.js";
 import { introMask } from "./intro.js";
+import { secondPart } from "./secondPart.js";
 
 const isIntro = (frame: number): boolean => {
 	return frame / FRAME_RATE < SONG_PARTS.INTRO.end;
@@ -11,6 +12,13 @@ const isHeavyPart = (frame: number): boolean => {
 	return (
 		frame / FRAME_RATE >= SONG_PARTS.HEAVY_PART.start &&
 		frame / FRAME_RATE < SONG_PARTS.HEAVY_PART.end
+	);
+};
+
+const isSecondPart = (frame: number): boolean => {
+	return (
+		frame / FRAME_RATE >= SONG_PARTS.SECOND_PART.start &&
+		frame / FRAME_RATE < SONG_PARTS.SECOND_PART.end
 	);
 };
 
@@ -31,6 +39,10 @@ export const alterImage = (
 
 	if (isHeavyPart(frame)) {
 		ctx.putImageData(heavy(frame, visibleRegion), 0, 0);
+		return canvas;
+	}
+	if (isSecondPart(frame)) {
+		ctx.putImageData(secondPart(frame, visibleRegion), 0, 0);
 		return canvas;
 	}
 

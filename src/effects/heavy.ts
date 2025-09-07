@@ -67,9 +67,6 @@ export const heavy: ImageEffect = (frame, { height, sx, sy, width }) => {
 			}
 		}
 	}
-	// TODO:
-	// 		morfnout lightness a saturation masky dohromady
-	// 		po intru by efekt měl postupně najet
 	return createImageData(
 		lightnessPixels.map((value, index) => {
 			if (value === 255) {

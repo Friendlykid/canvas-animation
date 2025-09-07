@@ -26,8 +26,16 @@ export const addBassLabel = (
 	ctx.font = "24px Arial";
 	ctx.strokeStyle = "black";
 	ctx.lineWidth = 2;
-	ctx.strokeText(`Bass is playing`, 20, height - 60);
-	ctx.fillText(`Bass is playing`, 20, height - 60);
+	ctx.strokeText(
+		`Bass is playing: ${(note.progress * 100).toFixed(3)}%`,
+		20,
+		height - 60,
+	);
+	ctx.fillText(
+		`Bass is playing: ${(note.progress * 100).toFixed(3)}%`,
+		20,
+		height - 60,
+	);
 };
 
 export const computeCoordinates = (
@@ -44,7 +52,7 @@ export const computeCoordinates = (
 	let sx = STATE.width / 2 + offsetX - drawwidth / 2;
 	let sy = STATE.height / 2 + offsetY - drawheight / 2;
 	if (isKickPlaying) {
-		const shakeIntensity = 3; // pixels
+		const shakeIntensity = progress * 3; // pixels
 		const angle = Math.random() * 2 * Math.PI;
 		const shakeX = Math.cos(angle) * shakeIntensity * Math.random();
 		const shakeY = Math.sin(angle) * shakeIntensity * Math.random();
