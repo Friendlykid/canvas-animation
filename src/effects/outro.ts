@@ -11,7 +11,6 @@ export const outro: ImageEffect = (frame, { height, sx, sy, width }) => {
 		(FRAME_COUNT - SONG_PARTS.SECOND_PART.end * FRAME_RATE);
 	const newImageData = new Uint8ClampedArray(STATE.originalImageData);
 	const { startX, endX, startY, endY } = getRegion({ height, sx, sy, width });
-	console.log(lightnessValue);
 	for (let y = startY; y < endY; y++) {
 		for (let x = startX; x < endX; x++) {
 			const i = (y * STATE.width + x) * 4;

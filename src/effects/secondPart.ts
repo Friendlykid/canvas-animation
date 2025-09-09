@@ -13,12 +13,35 @@ const HIGH_BASS_NOTE = 40;
 
 const BASS_NOTE_RANGE = HIGH_BASS_NOTE - LOW_BASS_NOTE;
 
-const getBassRegion = (noteNumber: number, startY: number, endY: number) => {
+const getBassRegion = (
+	frame: number,
+	noteNumber: number,
+	progress: number,
+	startY: number,
+	endY: number,
+) => {
 	const rowRange = endY - startY;
-	const bandHeight = Math.max(4, Math.floor(rowRange * 0.1)); // 10% of region height, at least 4px
-	const bandPosition =
-		(1 - (noteNumber - LOW_BASS_NOTE) / BASS_NOTE_RANGE) *
-		(rowRange - bandHeight);
+	const noteNorm = (noteNumber - LOW_BASS_NOTE) / BASS_NOTE_RANGE;
+	const perlinValue = perlinNoise(5 * frame);
+	// Lower notes: bigger bands, higher notes: smaller bands
+	const perlinRange = perlinToRange(perlinValue, 0.01, 2);
+	const bandHeightMin = 6;
+	let bandHeight = Math.max(
+		bandHeightMin,
+		Math.floor(
+			perlinRange *
+				((1 - progress) * 1.1) ** 2 *
+				rowRange *
+				(0.3 * (1 - noteNorm * 0.8)),
+		),
+	);
+	if (bandHeight <= 2 * bandHeightMin) {
+		const add = Math.floor(
+			perlinToRange(perlinValue, 1, 15) * (Math.sin(frame * 0.5) + 1),
+		);
+		bandHeight += add;
+	}
+	const bandPosition = (1 - noteNorm) * (rowRange - bandHeight);
 	return {
 		startRow: startY + bandPosition,
 		endRow: startY + bandPosition + bandHeight,
@@ -37,7 +60,13 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 		endRow: undefined,
 	};
 	if (bassNote) {
-		({ startRow, endRow } = getBassRegion(bassNote.noteNumber, startY, endY));
+		({ startRow, endRow } = getBassRegion(
+			frame,
+			bassNote.noteNumber,
+			bassNote.progress,
+			startY,
+			endY,
+		));
 	}
 	const perlinValueGlobal = perlinNoise(frame);
 
