@@ -1,4 +1,4 @@
-export const SONG_LENGTH = 138.352948 as const; // in seconds
+export const SONG_LENGTH = 142.588 as const; // in seconds
 
 // VIDEO constants
 

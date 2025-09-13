@@ -118,7 +118,7 @@ export const getCurrentNote = (instrument: InstrumentKey, frame: number) => {
 };
 
 export const getNotes = (instrument: InstrumentKey, frame: number) => {
-	const events = STATE[instrument];
+	const events = STATE[instrument] as MidiEvent[];
 
 	// For polyphonic instruments, find all currently playing notes
 	const playingNotes: Array<{
@@ -126,6 +126,7 @@ export const getNotes = (instrument: InstrumentKey, frame: number) => {
 		startFrame: number;
 		endFrame: number;
 		duration: number;
+		velocity: number;
 	}> = [];
 
 	// Group events by note number to track note on/off pairs
@@ -166,6 +167,7 @@ export const getNotes = (instrument: InstrumentKey, frame: number) => {
 						startFrame,
 						endFrame,
 						duration: endFrame - startFrame,
+						velocity: event.velocity,
 					});
 				}
 			}

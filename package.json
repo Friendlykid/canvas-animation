@@ -8,7 +8,7 @@
     "build": "tsc",
     "dev": "npm run build && node dist/index.js",
     "biome:fix": "biome check --write",
-    "video": "ffmpeg -framerate 12 -i dist/frames/frame_%d.png -i assets/drumy_104_master_snad_dobry.wav -vf \"scale=-1:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black\" -c:v libx264 -c:a copy -pix_fmt yuv420p audio_better.mp4",
+    "video": "ffmpeg -framerate 12 -i dist/frames/frame_%d.png -i assets/snad_final.wav -vf \"scale=-1:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black\" -c:v libx264 -c:a copy -pix_fmt yuv420p audio_better_longer.mp4",
     "video:sat": "ffmpeg -framerate 12 -i dist/satvideo/%d.png -vf \"scale=-1:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black\" -c:v libx264 -pix_fmt yuv420p sat_zero_to_hero.mp4",
     "video:satmask": "ffmpeg -framerate 12 -i dist/satmaskvideo/%d.png -vf \"scale=-1:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black\" -c:v libx264 -pix_fmt yuv420p satmask_zero_to_hero.mp4",
     "video:lightmask": "ffmpeg -framerate 12 -i dist/lightmaskvideo/%d.png -vf \"scale=-1:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2:black\" -c:v libx264 -pix_fmt yuv420p lightmask_zero_to_hero.mp4",

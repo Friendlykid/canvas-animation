@@ -12,7 +12,7 @@ const main = async () => {
 	const kickFile = await readFile("assets/KICK.mid");
 	const bassFile = await readFile("assets/BASS.mid");
 	const synthFile = await readFile("assets/SYNTH.mid");
-	const keysFile = await readFile("assets/KEYS.mid");
+	const keysFile = await readFile("assets/KEYS_new.mid");
 
 	const snareMidi = parseMidi(snareFile);
 	const kickMidi = parseMidi(kickFile);

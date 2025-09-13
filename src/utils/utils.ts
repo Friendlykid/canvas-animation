@@ -77,7 +77,24 @@ export const getRegion = ({
 	sy: number;
 	width: number;
 	height: number;
-}) => {
+}): {
+	/**
+	 * startColumn
+	 */
+	startX: number;
+	/**
+	 * endColumn
+	 */
+	endX: number;
+	/**
+	 * startRow
+	 */
+	startY: number;
+	/**
+	 * endRow
+	 */
+	endY: number;
+} => {
 	const startX = Math.floor(sx);
 	const endX = Math.min(Math.ceil(sx + width), STATE.width);
 	const startY = Math.floor(sy);
