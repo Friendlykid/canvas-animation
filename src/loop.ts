@@ -5,22 +5,19 @@ import { alterImage } from "./effects/alterImage.js";
 import { isKickPlaying } from "./state/kick.js";
 import { STATE } from "./state/state.js";
 import { introSkew } from "./utils/introSkew.js";
-import {
-	addBassLabel,
-	addFrameNumber,
-	computeCoordinates,
-} from "./utils/utils.js";
+import { computeCoordinates } from "./utils/utils.js";
 
 export const loop = ({ image }: { image: Image }) => {
 	const canvas = createCanvas(STATE.width, STATE.height);
 	const ctx = canvas.getContext("2d");
 
+	ctx.imageSmoothingEnabled = false;
+
 	// Create the output directory if it doesn't exist
 	mkdirSync(OUTPUT_DIR, { recursive: true });
-	// cca 250 pro heavy part, 814 for second part
-	for (let frame = 1350; frame < FRAME_COUNT; frame++) {
-		console.time("frame");
-		const progress = frame / FRAME_COUNT;
+	// cca 250 pro heavy part, 814 for second part, 1626 for outro
+	for (let frame = 0; frame < 70; frame++) {
+		const progress = (frame || 1) / FRAME_COUNT;
 		const currentZoom = ZOOM_MAX - progress * (ZOOM_MAX - ZOOM_MIN);
 		//const currentZoom = 1; // for testing
 		ctx.restore();
@@ -35,6 +32,7 @@ export const loop = ({ image }: { image: Image }) => {
 			isKickPlaying(frame),
 		);
 		ctx.clearRect(0, 0, STATE.width, STATE.height);
+		console.time(`effect:${frame}`);
 
 		ctx.drawImage(
 			alterImage(image, frame, {
@@ -52,12 +50,11 @@ export const loop = ({ image }: { image: Image }) => {
 			STATE.width,
 			STATE.height,
 		);
+		console.timeEnd(`effect:${frame}`);
+
 		introSkew(ctx, frame);
-		addFrameNumber(ctx, frame, STATE.height);
-		addBassLabel(ctx, frame, STATE.height);
 		const buffer = canvas.toBuffer("image/png");
 		writeFileSync(`${OUTPUT_DIR}/frame_${frame}.png`, buffer);
 		console.log(`Frame ${frame + 1}/${FRAME_COUNT}`);
-		console.timeEnd("frame");
 	}
 };

@@ -48,39 +48,46 @@ const getBassRegion = (
 	};
 };
 
-let highestSynthNoteCache: number | null = null;
 let lowestSynthNoteCache: number | null = null;
 
-let highestKeyNoteCache: number | null = null;
 let lowestKeyNoteCache: number | null = null;
 
-const getSynthRegion = (
+const keyNotes: number[] = [];
+
+const COLUMN_MARGIN = 4;
+
+const getPolyRegion = (
 	frame: number,
 	noteNumber: number,
-	startColumn: number,
-	endColumn: number,
+	minColumn: number,
+	maxColumn: number,
 	synthNoteBandWidth: number,
+	lowestNote: number,
+	uniqueNotes: number[],
+	staticWidth: boolean = false,
 ) => {
-	const columnRange = endColumn - startColumn;
-	const perlinValue = perlinNoise(5 * frame + 100); // Offset from bass perlin for variety
-	const perlinRange = perlinToRange(perlinValue, 0.1, 1.1);
+	const columnCount = maxColumn - minColumn;
+	const perlinValue = staticWidth
+		? 0
+		: perlinNoise((noteNumber - lowestNote || 5) * frame + 100); // Offset from bass perlin for variety
+	const perlinRange = perlinToRange(perlinValue, 0.5, 1.5);
 
 	// Calculate band width based on progress (wider at beginning, narrower at end)
 	const bandWidthMin = 10;
 	const bandWidth = Math.max(
 		bandWidthMin,
-		Math.floor(perlinRange * columnRange * 0.02),
+		Math.floor((perlinRange * columnCount) / synthNoteBandWidth),
 	);
 
-	// Calculate position based on note number (higher notes = further right)
-	// Find where in the full synth range this note falls
-	const notePosition =
-		(highestSynthNoteCache! - noteNumber) * synthNoteBandWidth;
-	const bandPosition = startColumn + notePosition;
-
+	const noteCenterPosition =
+		(columnCount / uniqueNotes.length) *
+			(uniqueNotes.indexOf(noteNumber) + 0.5) +
+		minColumn;
+	const startCol = noteCenterPosition - bandWidth / 2;
+	const endCol = noteCenterPosition + bandWidth / 2;
 	return {
-		startColumn: Math.floor(bandPosition),
-		endColumn: Math.floor(bandPosition + bandWidth),
+		startColumn: Math.floor(startCol) + COLUMN_MARGIN,
+		endColumn: Math.floor(endCol) - COLUMN_MARGIN,
 		synthNoteBandWidth,
 	};
 };
@@ -90,15 +97,11 @@ const getSynthRegions = (
 	startColumn: number,
 	endColumn: number,
 ) => {
-	const synthNotes = getNotes("synth", frame);
+	const { notes: synthNotes, uniqueNotes } = getNotes("synth", frame)!;
 	if (!synthNotes) return [];
-	if (highestSynthNoteCache === null) {
-		highestSynthNoteCache = STATE.synth.reduce(
-			(accNote, note) =>
-				accNote > note.noteNumber ? accNote : note.noteNumber,
-			0,
-		);
+	if (keyNotes.length === 0) {
 	}
+
 	if (lowestSynthNoteCache === null) {
 		lowestSynthNoteCache = STATE.synth.reduce(
 			(accNote, note) =>
@@ -107,34 +110,32 @@ const getSynthRegions = (
 		);
 	}
 	const synthNoteBandWidth = Math.floor(
-		(endColumn - startColumn) / (highestSynthNoteCache - lowestSynthNoteCache),
+		(endColumn - startColumn) / uniqueNotes.length,
 	);
+
 	return synthNotes.map((note) => {
 		const { noteNumber } = note;
-		return getSynthRegion(
+		return getPolyRegion(
 			frame,
 			noteNumber,
 			startColumn,
 			endColumn,
 			synthNoteBandWidth,
+			lowestSynthNoteCache!,
+			uniqueNotes,
+			true,
 		);
 	});
 };
 
 const getKeysRegions = (
 	frame: number,
-	startColumn: number,
-	endColumn: number,
+	minColumn: number,
+	maxColumn: number,
 ) => {
-	const keysNotes = getNotes("keys", frame);
+	const { notes: keysNotes, uniqueNotes } = getNotes("keys", frame);
 	if (!keysNotes) return [];
-	if (highestKeyNoteCache === null) {
-		highestKeyNoteCache = STATE.keys.reduce(
-			(accNote, note) =>
-				accNote > note.noteNumber ? accNote : note.noteNumber,
-			0,
-		);
-	}
+
 	if (lowestKeyNoteCache === null) {
 		lowestKeyNoteCache = STATE.keys.reduce(
 			(accNote, note) =>
@@ -143,17 +144,20 @@ const getKeysRegions = (
 		);
 	}
 	const synthNoteBandWidth = Math.floor(
-		(endColumn - startColumn) / (highestKeyNoteCache - lowestKeyNoteCache),
+		(maxColumn - minColumn) / uniqueNotes.length,
 	);
+
 	return keysNotes.map((note) => {
 		const { noteNumber, velocity } = note;
 		return {
-			...getSynthRegion(
+			...getPolyRegion(
 				frame,
 				noteNumber,
-				startColumn,
-				endColumn,
+				minColumn,
+				maxColumn,
 				synthNoteBandWidth,
+				lowestKeyNoteCache!,
+				uniqueNotes,
 			),
 			velocity,
 		};
@@ -207,8 +211,8 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 		width,
 	});
 
-	const synthRegions = getSynthRegions(frame, startX, endX);
-	const keysRegions = getKeysRegions(frame, startX, endX);
+	const synthRegions = getSynthRegions(frame, startX + 20, endX - 20);
+	const keysRegions = getKeysRegions(frame, startX + 20, endX - 20);
 
 	for (let row = startY; row <= endY; row++) {
 		const perlinRowValue = perlinNoise2D(
@@ -238,11 +242,11 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 			const i = (row * STATE.width + column) * 4;
 			const originalColor = Color.rgb(copy[i], copy[i + 1], copy[i + 2]);
 			const startBassRowEdge = startRow
-				? startRow + 10 * perlinEdgeStartValue
+				? startRow + 4 * perlinEdgeStartValue
 				: undefined;
 
 			const endBassRowEdge = endRow
-				? endRow + 10 * perlinEdgeEndValue
+				? endRow + 4 * perlinEdgeEndValue
 				: undefined;
 
 			const randomValue = Math.random() + 0.4;
@@ -277,12 +281,14 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 				copy[i + 2] = color.blue();
 			}
 			// synth effect
+			const synthRandomFactor = Math.random();
 			if (
 				synthRegions.some(
 					(r) =>
-						column >= r.startColumn + perlinRowFastValue * 4 &&
-						column <= r.endColumn - perlinRowFastValue * 4,
-				)
+						column >= r.startColumn + perlinRowFastValue * COLUMN_MARGIN &&
+						column <= r.endColumn - perlinRowFastValue * COLUMN_MARGIN,
+				) &&
+				synthRandomFactor > 0.2
 			) {
 				const perlinPixelFastValue = perlinNoise2D(
 					(20 * column) / STATE.width +
@@ -320,16 +326,30 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 				copy[i + 2] = color.blue();
 			}
 			// keys effect
-			const keyNote = keysRegions.find(
-				(r) =>
-					column >= r.startColumn + perlinRowSlowerValue * 4 &&
-					column <= r.endColumn - perlinRowSlowerValue * 4 &&
-					row >=
-						startY +
-							(((endY - startY) / 6) * r.velocity) / 127 +
-							perlinToRange(perlinValueGlobal, 0, (endY - startY) / 4),
-			);
-			if (keyNote) {
+			// Calculate the rounded top edge using sine function
+			const keyNote = keysRegions.find((r) => {
+				// Calculate the top edge position of the rectangle
+				const topEdgeBase =
+					startY +
+					(((endY - startY) / 6) * r.velocity) / 127 +
+					perlinToRange(perlinValueGlobal, 0, (endY - startY) / 4);
+				// Calculate horizontal position within the key band (0 to 1)
+				const horizontalPos =
+					(column - r.startColumn) / (r.endColumn - r.startColumn);
+
+				// Apply sine wave to create rounded top (higher in the middle, lower at edges)
+				const roundingAmount = 15 * Math.sin(Math.PI * horizontalPos); // Adjust 15 to control rounding height
+
+				return (
+					column >=
+						r.startColumn + (perlinRowSlowerValue + 1) * COLUMN_MARGIN &&
+					column <= r.endColumn - (perlinRowSlowerValue + 1) * COLUMN_MARGIN &&
+					row >= topEdgeBase - roundingAmount
+				);
+			});
+			const keyRandomFactor = Math.random();
+
+			if (keyNote && keyRandomFactor > 0.3) {
 				const perlinPixelSlowerValue = perlinNoise2D(
 					column / STATE.width +
 						(SONG_PARTS.SECOND_PART.start / FRAME_RATE -
@@ -346,19 +366,25 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 							(SONG_PARTS.SECOND_PART.end * FRAME_RATE -
 								SONG_PARTS.SECOND_PART.start * FRAME_RATE),
 				);
-				const color = Color.hsl([
-					originalColor.hue(),
-					originalColor.saturationl(),
+				const color = Color.rgb(copy[i], copy[i + 1], copy[i + 2]);
+				const newColor = color.hsl(
+					color.hue(),
 					Math.min(
 						100,
-						originalColor.lightness() +
-							perlinToRange(perlinPixelSlowerValue, 10, 40),
+						color.saturationl() + perlinToRange(perlinRowFastValue, 0, 40),
 					),
-				]);
-				copy[i] = color.red();
-				copy[i + 1] = color.green();
-				copy[i + 2] = color.blue();
+					Math.min(
+						100,
+						color.lightness() +
+							(color.isLight() ? -1 : 1) *
+								perlinToRange(perlinPixelSlowerValue, 10, 30),
+					),
+				);
+				copy[i] = newColor.red();
+				copy[i + 1] = newColor.green();
+				copy[i + 2] = newColor.blue();
 			}
+			//bass effect
 			if (
 				startBassRowEdge !== undefined &&
 				endBassRowEdge !== undefined &&

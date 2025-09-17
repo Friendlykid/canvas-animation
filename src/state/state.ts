@@ -176,11 +176,14 @@ export const getNotes = (instrument: InstrumentKey, frame: number) => {
 
 	// Return the longest playing note, or null if no notes are playing
 	if (playingNotes.length === 0) {
-		return null;
+		return { uniqueNotes: noteGroups.size, notes: null };
 	}
 
-	return playingNotes.map((note) => ({
-		...note,
-		progress: (frame - note.startFrame) / note.duration,
-	}));
+	return {
+		uniqueNotes: Array.from(noteGroups.keys()).sort((a, b) => a - b),
+		notes: playingNotes.map((note) => ({
+			...note,
+			progress: (frame - note.startFrame) / note.duration,
+		})),
+	};
 };
