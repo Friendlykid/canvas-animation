@@ -13,12 +13,14 @@ const main = async () => {
 	const bassFile = await readFile("assets/BASS.mid");
 	const synthFile = await readFile("assets/SYNTH.mid");
 	const keysFile = await readFile("assets/KEYS_new.mid");
+	const longSynthFile = await readFile("assets/LONG_SYNTH2.mid");
 
 	const snareMidi = parseMidi(snareFile);
 	const kickMidi = parseMidi(kickFile);
 	const bassMidi = parseMidi(bassFile);
 	const synthMidi = parseMidi(synthFile);
 	const keysMidi = parseMidi(keysFile);
+	const longSynthMidi = parseMidi(longSynthFile);
 
 	const image = await loadImage("assets/cesta.jpg");
 	const canvas = createCanvas(image.width, image.height);
@@ -64,6 +66,7 @@ const main = async () => {
 		bass: parseMidiEvents(bassMidi, 0),
 		synth: parseMidiEvents(synthMidi, 0),
 		keys: parseMidiEvents(keysMidi, 0),
+		synth2: parseMidiEvents(longSynthMidi, 0),
 		originalImageData: imageData.data,
 		height: image.height,
 		width: image.width,

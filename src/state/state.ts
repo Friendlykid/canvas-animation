@@ -9,6 +9,7 @@ export const STATE: State = {
 	snare: [],
 	bass: [],
 	synth: [],
+	synth2: [],
 	keys: [],
 	width: 0,
 	height: 0,
@@ -30,6 +31,7 @@ export type State = {
 	snare: MidiEvent[];
 	bass: MidiEvent[];
 	synth: MidiEvent[];
+	synth2: MidiEvent[];
 	keys: MidiEvent[];
 	width: number;
 	height: number;
@@ -173,14 +175,14 @@ export const getNotes = (instrument: InstrumentKey, frame: number) => {
 			}
 		}
 	}
-
+	const uniqueNotes = Array.from(noteGroups.keys()).sort((a, b) => a - b);
 	// Return the longest playing note, or null if no notes are playing
 	if (playingNotes.length === 0) {
-		return { uniqueNotes: noteGroups.size, notes: null };
+		return { uniqueNotes, notes: null };
 	}
 
 	return {
-		uniqueNotes: Array.from(noteGroups.keys()).sort((a, b) => a - b),
+		uniqueNotes,
 		notes: playingNotes.map((note) => ({
 			...note,
 			progress: (frame - note.startFrame) / note.duration,

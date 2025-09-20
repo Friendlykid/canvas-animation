@@ -16,7 +16,7 @@ export const loop = ({ image }: { image: Image }) => {
 	// Create the output directory if it doesn't exist
 	mkdirSync(OUTPUT_DIR, { recursive: true });
 	// cca 250 pro heavy part, 814 for second part, 1626 for outro
-	for (let frame = 0; frame < 70; frame++) {
+	for (let frame = 1083; frame < 1224; frame++) {
 		const progress = (frame || 1) / FRAME_COUNT;
 		const currentZoom = ZOOM_MAX - progress * (ZOOM_MAX - ZOOM_MIN);
 		//const currentZoom = 1; // for testing

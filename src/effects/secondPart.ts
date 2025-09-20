@@ -52,8 +52,6 @@ let lowestSynthNoteCache: number | null = null;
 
 let lowestKeyNoteCache: number | null = null;
 
-const keyNotes: number[] = [];
-
 const COLUMN_MARGIN = 4;
 
 const getPolyRegion = (
@@ -97,10 +95,8 @@ const getSynthRegions = (
 	startColumn: number,
 	endColumn: number,
 ) => {
-	const { notes: synthNotes, uniqueNotes } = getNotes("synth", frame)!;
+	const { notes: synthNotes, uniqueNotes } = getNotes("synth", frame);
 	if (!synthNotes) return [];
-	if (keyNotes.length === 0) {
-	}
 
 	if (lowestSynthNoteCache === null) {
 		lowestSynthNoteCache = STATE.synth.reduce(
@@ -164,6 +160,8 @@ const getKeysRegions = (
 	});
 };
 
+const LAST_NOTE_NUMBER = 82;
+
 export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 	const { endX, endY, startX, startY } = getRegion({ height, sx, sy, width });
 	const bassNote = getCurrentNote("bass", frame);
@@ -213,7 +211,8 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 
 	const synthRegions = getSynthRegions(frame, startX + 20, endX - 20);
 	const keysRegions = getKeysRegions(frame, startX + 20, endX - 20);
-
+	const synth2Notes = getNotes("synth2", frame);
+	console.log(synth2Notes.notes);
 	for (let row = startY; row <= endY; row++) {
 		const perlinRowValue = perlinNoise2D(
 			row / (10 * STATE.height),
@@ -414,6 +413,49 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 					copy[i + 1] = color.green();
 					copy[i + 2] = color.blue();
 				}
+			}
+			// synth2 effect - increase saturation from bottom to half of image based on note progress
+			// TODO postupně zvýšit saturaci od nuly dole po 100 na vrchu pásma
+			if (synth2Notes.notes) {
+				synth2Notes.notes.forEach((note, _noteIndex) => {
+					const perlin = perlinNoise2D(
+						(25 * column * ((note?.noteNumber ?? 5) / 5)) / STATE.height +
+							(20 * frame) / FRAME_COUNT,
+						(70 * frame) / FRAME_COUNT + 2,
+					);
+					const middleRow = Math.floor(endY - (endY - startY) / 2);
+					const edgeFuckery = perlinToRange(perlin, 0, (endY - startY) / 10);
+					const edgeRow = endY - middleRow * note.progress - edgeFuckery;
+					const isLastNote =
+						frame >=
+							(STATE.synth2.filter((e) => e.type === "noteOn").at(-1)?.frame ??
+								FRAME_COUNT) && note.noteNumber === LAST_NOTE_NUMBER;
+
+					if (row > edgeRow) {
+						const randomValue = Math.random();
+						const linearProgress =
+							(row - edgeRow) / (endY - edgeRow || 0.00001);
+						const rowProgress = 1 - (1 - linearProgress) * (1 - linearProgress);
+						const currentColor = Color.rgb(copy[i], copy[i + 1], copy[i + 2]);
+
+						const saturate =
+							randomValue < 2 * rowProgress ? rowProgress * 100 : 0;
+
+						const color = Color.hsl([
+							currentColor.hue(),
+							Math.min(100, currentColor.saturationl() + saturate),
+							currentColor.lightness() +
+								(isLastNote
+									? currentColor.isLight()
+										? -1 * rowProgress * 30
+										: rowProgress * 30
+									: 0),
+						]);
+						copy[i] = color.red();
+						copy[i + 1] = color.green();
+						copy[i + 2] = color.blue();
+					}
+				});
 			}
 		}
 	}
