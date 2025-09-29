@@ -212,7 +212,6 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 	const synthRegions = getSynthRegions(frame, startX + 20, endX - 20);
 	const keysRegions = getKeysRegions(frame, startX + 20, endX - 20);
 	const synth2Notes = getNotes("synth2", frame);
-	console.log(synth2Notes.notes);
 	for (let row = startY; row <= endY; row++) {
 		const perlinRowValue = perlinNoise2D(
 			row / (10 * STATE.height),
@@ -417,15 +416,20 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 			// synth2 effect - increase saturation from bottom to half of image based on note progress
 			// TODO postupně zvýšit saturaci od nuly dole po 100 na vrchu pásma
 			if (synth2Notes.notes) {
-				synth2Notes.notes.forEach((note, _noteIndex) => {
+				synth2Notes.notes.forEach((note) => {
 					const perlin = perlinNoise2D(
 						(25 * column * ((note?.noteNumber ?? 5) / 5)) / STATE.height +
 							(20 * frame) / FRAME_COUNT,
 						(70 * frame) / FRAME_COUNT + 2,
 					);
-					const middleRow = Math.floor(endY - (endY - startY) / 2);
-					const edgeFuckery = perlinToRange(perlin, 0, (endY - startY) / 10);
-					const edgeRow = endY - middleRow * note.progress - edgeFuckery;
+					const middleRow = Math.floor(
+						endY - (endY - startY) / (note.id === 3 ? 4 : 2),
+					);
+					const edgeFuckery = perlinToRange(perlin, 0, (endY - startY) / 7);
+					const edgeRow =
+						endY -
+						middleRow * (note.id === 1 ? 1 - note.progress : note.progress) +
+						edgeFuckery;
 					const isLastNote =
 						frame >=
 							(STATE.synth2.filter((e) => e.type === "noteOn").at(-1)?.frame ??
@@ -450,7 +454,7 @@ export const secondPart: ImageEffect = (frame, { height, sx, sy, width }) => {
 										? -1 * rowProgress * 30
 										: rowProgress * 30
 									: 0),
-						]);
+						]).rotate(note.noteNumber);
 						copy[i] = color.red();
 						copy[i + 1] = color.green();
 						copy[i + 2] = color.blue();

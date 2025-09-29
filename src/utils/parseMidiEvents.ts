@@ -1,13 +1,14 @@
 import type { MidiData, MidiNoteOffEvent, MidiNoteOnEvent } from "midi-file";
 import { TICKS_PER_FRAME } from "../constants.js";
 
-export type BaseEvent = {
+type BaseEventProps = {
 	frame: number;
+	id: number;
 };
 
-export type MidiEvent = (MidiNoteOnEvent | MidiNoteOffEvent) & BaseEvent;
+export type MidiEvent = (MidiNoteOnEvent | MidiNoteOffEvent) & BaseEventProps;
 
-export type KickEvent = MidiNoteOnEvent & BaseEvent;
+export type KickEvent = MidiNoteOnEvent & BaseEventProps;
 
 /**
  *
@@ -27,8 +28,10 @@ export const parseMidiEvents = (midiData: MidiData, frameLength?: number) => {
 		} as MidiEvent;
 	}
 
-	return events.filter(
-		(event): event is MidiNoteOnEvent | MidiNoteOffEvent =>
-			event.type === "noteOn" || (!frameLength && event.type === "noteOff"),
-	) as MidiEvent[];
+	return events
+		.filter(
+			(event): event is MidiNoteOnEvent | MidiNoteOffEvent =>
+				event.type === "noteOn" || (!frameLength && event.type === "noteOff"),
+		)
+		.map((event, i) => ({ ...event, id: i })) as MidiEvent[];
 };

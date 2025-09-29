@@ -129,6 +129,7 @@ export const getNotes = (instrument: InstrumentKey, frame: number) => {
 		endFrame: number;
 		duration: number;
 		velocity: number;
+		id: number;
 	}> = [];
 
 	// Group events by note number to track note on/off pairs
@@ -170,6 +171,7 @@ export const getNotes = (instrument: InstrumentKey, frame: number) => {
 						endFrame,
 						duration: endFrame - startFrame,
 						velocity: event.velocity,
+						id: event.id,
 					});
 				}
 			}
