@@ -1,11 +1,11 @@
-export const SONG_LENGTH = 142.588 as const; // in seconds
+export const SONG_LENGTH = 161 as const; // in seconds
 
 // VIDEO constants
 
 /**
  * Number of frames per second
  */
-export const FRAME_RATE = 12 as const;
+export const FRAME_RATE = 24 as const;
 
 export const FRAME_COUNT = Math.ceil(FRAME_RATE * SONG_LENGTH);
 
@@ -37,11 +37,7 @@ export type SongPart = {
 	end: number;
 };
 
-export const SONG_PARTS: Record<
-	"INTRO" | "HEAVY_PART" | "SECOND_PART",
-	SongPart
-> = {
-	INTRO: { start: 0, end: 271 / 12 },
-	HEAVY_PART: { start: 271 / 12, end: 814 / 12 },
-	SECOND_PART: { start: 814 / 12, end: 135.529 }, // until the end of the song
+export const SONG_PARTS: Record<"INTRO" | "OUTRO", SongPart> = {
+	INTRO: { start: 0, end: 27 },
+	OUTRO: { start: 3624 / 24, end: SONG_LENGTH },
 };

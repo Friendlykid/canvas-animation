@@ -3,7 +3,7 @@ import { FRAME_COUNT } from "../constants.js";
 
 const { Noise } = pkg;
 
-const noise = new Noise(10);
+const noise = new Noise(5);
 
 export const perlinNoise = (frame: number): number => {
 	return noise.perlin2((20 * frame) / FRAME_COUNT, Math.floor(frame / 1600));

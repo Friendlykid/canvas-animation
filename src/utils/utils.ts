@@ -1,6 +1,6 @@
 import type { CanvasRenderingContext2D } from "canvas";
-import { FRAME_RATE } from "../constants.js";
-import { getCurrentNote, STATE } from "../state/state.js";
+import { FRAME_RATE, SONG_PARTS } from "../constants.js";
+import { STATE } from "../state/state.js";
 
 export const addFrameNumber = (
 	ctx: CanvasRenderingContext2D,
@@ -13,29 +13,6 @@ export const addFrameNumber = (
 	ctx.lineWidth = 2;
 	ctx.strokeText(`Frame ${frameNumber}`, 20, height - 20);
 	ctx.fillText(`Frame ${frameNumber}`, 20, height - 20);
-};
-
-export const addBassLabel = (
-	ctx: CanvasRenderingContext2D,
-	frameNumber: number,
-	height: number,
-) => {
-	const note = getCurrentNote("bass", frameNumber);
-	if (!note) return;
-	ctx.fillStyle = "white";
-	ctx.font = "24px Arial";
-	ctx.strokeStyle = "black";
-	ctx.lineWidth = 2;
-	ctx.strokeText(
-		`Bass is playing: ${(note.progress * 100).toFixed(3)}%`,
-		20,
-		height - 60,
-	);
-	ctx.fillText(
-		`Bass is playing: ${(note.progress * 100).toFixed(3)}%`,
-		20,
-		height - 60,
-	);
 };
 
 export const computeCoordinates = (
@@ -105,4 +82,8 @@ export const getRegion = ({
 
 export const secondsToFrames = (seconds: number): number => {
 	return Math.floor(seconds * FRAME_RATE);
+};
+
+export const isOutro = (frame: number): boolean => {
+	return frame / FRAME_RATE >= SONG_PARTS.OUTRO.start;
 };
