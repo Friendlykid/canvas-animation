@@ -1,4 +1,4 @@
-export const SONG_LENGTH = 161 as const; // in seconds
+export const SONG_LENGTH = 44 + 2 * 60; // in seconds
 
 // VIDEO constants
 
@@ -39,5 +39,5 @@ export type SongPart = {
 
 export const SONG_PARTS: Record<"INTRO" | "OUTRO", SongPart> = {
 	INTRO: { start: 0, end: 27 },
-	OUTRO: { start: 3624 / 24, end: SONG_LENGTH },
+	OUTRO: { start: 3625 / 24, end: SONG_LENGTH },
 };

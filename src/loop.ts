@@ -1,13 +1,15 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { createCanvas, loadImage } from "canvas";
-import { FRAME_COUNT, OUTPUT_DIR } from "./constants.js";
+import { FRAME_COUNT, OUTPUT_DIR, SONG_PARTS } from "./constants.js";
 import { introMask } from "./effects/intro.js";
 import { STATE } from "./state/state.js";
 import { introSkew } from "./utils/introSkew.js";
 import { isOutro } from "./utils/utils.js";
 
-const add = 3653 - 3624;
+const add = 3653 - SONG_PARTS.OUTRO.start * 24;
+
+const OUTRO_OUTPUT_DIR = "dist/outro_frames";
 
 export const loop = async () => {
 	const canvas = createCanvas(STATE.width, STATE.height);
@@ -15,7 +17,7 @@ export const loop = async () => {
 
 	ctx.imageSmoothingEnabled = false;
 
-	mkdirSync(OUTPUT_DIR, { recursive: true });
+	mkdirSync(OUTRO_OUTPUT_DIR, { recursive: true });
 	for (let frame = 3620; frame < FRAME_COUNT; frame++) {
 		console.time(`frame ${frame}/${FRAME_COUNT}`);
 
@@ -35,6 +37,9 @@ export const loop = async () => {
 
 		introSkew(ctx, frame);
 		const buffer = canvas.toBuffer("image/png");
+		if (isOutro(frame)) {
+			writeFileSync(`${OUTRO_OUTPUT_DIR}/frame_${frame}.png`, buffer);
+		}
 		writeFileSync(`${OUTPUT_DIR}/frame_${frame}.png`, buffer);
 		console.timeEnd(`frame ${frame}/${FRAME_COUNT}`);
 	}

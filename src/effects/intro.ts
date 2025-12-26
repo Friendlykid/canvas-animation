@@ -39,11 +39,13 @@ export const introMask = (frame: number, imageData: ImageData) => {
 		const outroProgress =
 			(frame - SONG_PARTS.OUTRO.start * FRAME_RATE) /
 			((SONG_PARTS.OUTRO.end - SONG_PARTS.OUTRO.start) * FRAME_RATE);
-		base = Math.abs(
-			100 *
-				(easeOutBounceDeep(outroProgress) +
-					(outroProgress < 0.3 ? easeInOutSine(outroProgress * 3) / 15 : 0)),
-		);
+		base =
+			20 +
+			Math.abs(
+				80 *
+					(easeOutBounceDeep(outroProgress) +
+						(outroProgress < 0.3 ? easeInOutSine(outroProgress * 3) / 15 : 0)),
+			);
 	}
 
 	const lightnessValue = perlinToRange(perlinValue, 100 - (base || 100), 100);
@@ -51,13 +53,20 @@ export const introMask = (frame: number, imageData: ImageData) => {
 	const saturationValue = perlinToRange(perlinValue, 0, 100 - base);
 
 	const lightnessData = lightnessMask(lightnessValue, imageData);
-	const saturationData = saturationMask(saturationValue, imageData);
+	const saturationData = saturationMask(
+		saturationValue,
+		imageData,
+		perlinValue,
+		frame,
+	);
 	return createImageData(
-		(isOutroBool ? saturationData : lightnessData).map((value, index) => {
-			return (
-				value || (isOutroBool ? lightnessData[index] : saturationData[index])
-			);
-		}),
+		!isOutroBool
+			? lightnessData.map((value, index) => {
+					return value || saturationData[index];
+				})
+			: saturationData.map((value, index) => {
+					return value || lightnessData[index];
+				}),
 		STATE.width,
 		STATE.height,
 	);
